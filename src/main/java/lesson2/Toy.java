@@ -1,5 +1,7 @@
 package lesson_2;
 
+import java.util.Objects;
+
 public class Toy implements Item {
 
     private int weight;
@@ -22,6 +24,19 @@ public class Toy implements Item {
     @Override
     public int getVolume() {
         return volume;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Toy toy = (Toy) o;
+        return weight == toy.weight && volume == toy.volume;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(weight, volume);
     }
 
     public void setVolume(int volume) {

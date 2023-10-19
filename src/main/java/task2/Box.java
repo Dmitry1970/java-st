@@ -1,7 +1,8 @@
-package lesson_2;
+package lesson2;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.w3c.dom.ls.LSOutput;
+
+import java.util.*;
 
 public class Box implements Comparable<Box>, Item {
 
@@ -9,19 +10,10 @@ public class Box implements Comparable<Box>, Item {
     private String color;
     private List<Item> items;
     private boolean isOpen;
-    private int weight;
 
-    private List<Item> getItems() {   //сделал private для недоступности из main
-        return items;
-    }
 
-    public List<Item> getGetItems() {
-        return getItems();
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
+    public List<Item> getItems() {
+        return Collections.unmodifiableList(items);
     }
 
     @Override
@@ -41,7 +33,7 @@ public class Box implements Comparable<Box>, Item {
         this.volume = volume;
         this.color = color;
         this.items = new ArrayList<>();
-        this.weight = 0;
+
     }
 
     public boolean isInBox(Item item) {    // проверка наличия предмета в коробке
@@ -80,7 +72,8 @@ public class Box implements Comparable<Box>, Item {
         return currentVolume;
     }
 
-    public int getCurrentWeight() {    // текущий вес всех предметов в коробке
+    @Override
+    public int getWeight() {    // текущий вес всех предметов в коробке
         int itemsWeight = 0;
         for (int i = 0; i < items.size(); i++) {
             itemsWeight += items.get(i).getWeight();
@@ -98,20 +91,19 @@ public class Box implements Comparable<Box>, Item {
             return;
         }
         items.add(item);
-        weight += item.getWeight();
         System.out.printf("Положили %s в коробку\n", item);
     }
 
-    public boolean isPutBoxInBox(Box b) {     // можно ли положить коробку в коробку
-        return (this.volume - this.getCurrentVolume() > b.volume);
-    }
+//    public boolean isPutBoxInBox(Box b) {     // можно ли положить коробку в коробку
+//        return (this.volume - this.getCurrentVolume() > b.volume);
+//    }
 
     public void getItemsFromAnotherBox(Box box) {     // кладём предметы из другой коробки
         if (this.getCurrentVolume() - box.getCurrentVolume() > 0) {
             for (Item i : box.getItems()) {
                 put(i);
             }
-            getCurrentWeight();  // пересчитывает вес всех предметов в коробке после добавления предметов из коробки
+            box.items.clear();
             System.out.println("В коробке стало предметов: " + getClass().getSimpleName() + "= {" + this.getItems() + "}");
         }
     }
@@ -136,10 +128,24 @@ public class Box implements Comparable<Box>, Item {
 
     public void info() {
         System.out.printf("Первоначальный объем коробки - %d, заполнено объёма - %d,  вес коробки - %d, цвет коробки- %s," +
-                " коробка открыта - %b\n", volume, getCurrentVolume(), getCurrentWeight(), color, isOpen);
+                " коробка открыта - %b\n", volume, getCurrentVolume(), getWeight(), color, isOpen);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(volume, color, items, isOpen);
     }
 
     public Item getMaxVolumeItem() {
+        if(items.isEmpty()) {
+            return null;
+        }
         int maxVolume = items.get(0).getVolume();
         Item it = items.get(0);
         for (int i = 1; i < items.size(); i++) {
@@ -151,25 +157,29 @@ public class Box implements Comparable<Box>, Item {
         return it;
     }
 
-    public void getMaxItemsName() {
-        int maxCountName = 0;
-        String temp = "";
-        String maxName = "";
-        for (int i = 0; i < items.size(); i++) {
-            temp = items.get(i).getClass().getSimpleName();
-            int countTemp = 0;
-            for (int j = 0; j < items.size(); j++) {
-                if (temp.equals(items.get(j).getClass().getSimpleName())) {
-                    countTemp++;
-                }
-            }
-            if (maxCountName < countTemp) {
-                maxCountName = countTemp;
-                maxName = temp;
-            }
+    public boolean isVolumeEnough(Item item) {
+        return getCurrentVolume() + item.getVolume() <= volume;
+    }
 
+    public void getMaxItemsName() {   // подсчёт максимального количества предметов какого класса
+
+        if(items.isEmpty()) {
+            System.out.println("В коробке нет объектов");
+         return;
         }
-        System.out.printf("Больше всего в коробке предметов класса %s, количество предметов этого класса - %d\n", maxName, maxCountName);
+        Map<String, Integer> countMaxName =new HashMap<>();
+        for (int i = 0; i < items.size(); i++) {
+            String itemClass = items.get(i).getClass().getSimpleName();
+            countMaxName.put(itemClass, countMaxName.getOrDefault(itemClass, 0) + 1);
+        }
+
+
+        Map.Entry<String, Integer> result = countMaxName.entrySet().stream()
+                .sorted((o1, o2) -> o2.getValue() - o1.getValue())
+                .limit(1)
+                .findFirst()
+                .get();
+        System.out.printf("Больше всего в коробке предметов класса %s, количество предметов этого класса - %d\n", result.getKey(), result.getValue());
     }
 
     @Override
@@ -180,11 +190,6 @@ public class Box implements Comparable<Box>, Item {
 
     @Override
     public int compareTo(Box o) {
-        if (this.weight > o.weight) {
-            return 1;
-        } else if (this.weight < o.weight) {
-            return -1;
-        }
-        return 0;
+        return this.getWeight() - o.getWeight();
     }
 }
