@@ -1,4 +1,6 @@
-package lesson_2;
+package task2;
+
+import java.util.Objects;
 
 public class Phone implements Item {
 
@@ -26,6 +28,19 @@ public class Phone implements Item {
 
     public void setVolume(int volume) {
         this.volume = volume;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Phone phone = (Phone) o;
+        return weight == phone.weight && volume == phone.volume;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(weight, volume);
     }
 
     @Override

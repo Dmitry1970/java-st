@@ -1,4 +1,4 @@
-package lesson_2;
+package task2;
 
 public interface Item {
 

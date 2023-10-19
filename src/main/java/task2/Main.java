@@ -1,4 +1,4 @@
-package lesson_2;
+package task2;
 
 public class Main {
 
@@ -24,17 +24,18 @@ public class Main {
         box1.put(new Phone(220, 40));
         box1.info();
 
-        System.out.println("Можно ли положить коробку в коробку: " + box.isPutBoxInBox(box1));
+        System.out.println("Можно ли положить коробку в коробку: " + box.isVolumeEnough(box1));
         box.put(box1);
         box.info();
         box.takeItemFromBox(box1);
         box.info();
 
-        System.out.println("\nПроверка наличия предмета в коробке: " + box.isInBox(box.getGetItems().get(0)));  // наличие предмета в коробке ???
+        System.out.println("\nПроверка наличия предмета в коробке: " + box.isInBox(new Phone(120, 15)));  // наличие предмета в коробке ???
 
         System.out.println("\nКладём предметы из одной коробки в другую коробку: ");
         box.getItemsFromAnotherBox(box1);
         box.info();
+        box1.info();
         System.out.println("Самый объемный предмет в коробке: " + box.getMaxVolumeItem());
         box.getMaxItemsName();
         System.out.println(box.compareTo(box1));
@@ -42,6 +43,10 @@ public class Main {
         box.info();
         box.changeColor("red");
         box.info();
+
+
+//        box.getItems().add(new Phone(120, 1000));
+
     }
 }
 
